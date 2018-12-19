@@ -16,4 +16,8 @@ router.get('/json', async (ctx, next) => {
   }
 })
 
+router.post('/upload',async (ctx,next) =>{
+
+});
+
 module.exports = router
