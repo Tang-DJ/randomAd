@@ -4,32 +4,7 @@
       <el-main>
         <el-col :span="12">
           <el-card class="box-card">
-            <el-form ref="form" :model="form" label-width="80px" :rules="rules">
-              <el-form-item label="添加文本" prop="str">
-                <el-input v-model="form.str"></el-input>
-              </el-form-item>
-              <el-form-item label="规则" prop="rule">
-                <el-radio-group v-model="form.rule">
-                  <el-radio label="0">共加入X个文本</el-radio>
-                  <el-radio label="1">每X子长加入一个文本</el-radio>
-                </el-radio-group>
-              </el-form-item>
-              <el-form-item label="num" prop="num">
-                <el-input-number v-model="form.num" :min="0"></el-input-number>
-              </el-form-item>
-              <el-form-item label="替换方式" prop="type">
-                <el-radio-group v-model="form.type">
-                  <el-radio label="0">平均</el-radio>
-                  <el-radio label="1" :disabled="form.rule==='1'">随机</el-radio>
-                </el-radio-group>
-              </el-form-item>
-              <el-form-item label="文本" prop="text">
-                <el-input type="textarea" v-model="form.text"></el-input>
-              </el-form-item>
-              <el-form-item>
-                <el-button type="primary" @click="addAd('form')">立即添加</el-button>
-              </el-form-item>
-            </el-form>
+            <inputForm @getForm="addAd"/>
           </el-card>
         </el-col>
         <el-col :span="12">
@@ -47,44 +22,16 @@
 
 <script>
 import Clipboard from 'clipboard';
+import inputForm from './../components/inputForm'
 
 export default {
   name: 'home',
   components: {
-
+      inputForm
   },
   data(){
-    return{
-        address: '',//txt地址
-        str: '',//替换字符串
-        rule: '0',//
-        form:{
-            address:'',
-            str:'',
-            rule: '',
-            num: '',
-            type: '',
-            text: ''
-        },
-        x: 0,
-        dealText:'',
-        rules: {
-            str: [
-                { required: true, message: '请输入添加文本', trigger: 'blur' },
-            ],
-            rule: [
-                { required: true, message: '请选择规则', trigger: 'blur' }
-            ],
-            num: [
-                { required: true, message: '请输入num', trigger: 'blur' }
-            ],
-            type: [
-                { required: true, message: '请选择替换方式', trigger: 'blur' }
-            ],
-            text: [
-                { required: true, message: '请输入原文本', trigger: 'change' }
-            ]
-        }
+    return {
+        dealText: '',
     }
   },
   mounted() {
@@ -106,20 +53,15 @@ export default {
       })
   },
   methods: {
-      addAd: function (ref) {
-          this.$refs[ref].validate((valid) => {
-              if (!valid) {
-                  return false;
-              }
-          });
+      addAd: function (form) {
           let insert;
-          if(this.form.type === '0')
-              insert = this.getAverage(this.form.text.length-1,this.form.num);
-          else if(this.form.type === '1')
-              insert = this.getRandom(this.form.text.length-1,this.form.num);
-          this.insertToContent(insert,this.form.text,this.form.str);
+          if(form.type === '0')
+              insert = this.getAverage(form.text.length-1,form.num);
+          else if(form.type === '1')
+              insert = this.getRandom(form.text.length-1,form.num);
+          this.insertToContent(insert,form.text,form.str);
           this.$message({
-              message: `原文本共${this.form.text.length}子长,本次加入${this.form.num}个'${this.form.str}'`,
+              message: `原文本共${form.text.length}子长,本次加入${form.num}个'${form.str}'`,
               type: 'success'
           });
       },
