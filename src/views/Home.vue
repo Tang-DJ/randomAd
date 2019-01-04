@@ -4,7 +4,7 @@
       <el-main>
         <el-col :span="12">
           <el-card class="box-card">
-            <inputForm @getForm="addAd"/>
+            <inputForm @getForm="textProduct"/>
           </el-card>
         </el-col>
         <el-col :span="12">
@@ -23,6 +23,7 @@
 <script>
 import Clipboard from 'clipboard';
 import inputForm from './../components/inputForm'
+import {writeFile} from './../common/fileCommon'
 
 export default {
   name: 'home',
@@ -32,6 +33,7 @@ export default {
   data(){
     return {
         dealText: '',
+        textList: {},
     }
   },
   mounted() {
@@ -53,25 +55,39 @@ export default {
       })
   },
   methods: {
-      addAd: function (form) {
-          let insert;
-          if(form.type === '0')
-              insert = this.getAverage(form.text.length-1,form.num);
-          else if(form.type === '1')
-              insert = this.getRandom(form.text.length-1,form.num);
-          this.insertToContent(insert,form.text,form.str);
-          this.$message({
-              message: `原文本共${form.text.length}子长,本次加入${form.num}个'${form.str}'`,
-              type: 'success'
-          });
+      textProduct:function(form,textList){
+          this.textList = textList;
+          let type = form.type;
+          let num = form.num;
+          let str = form.str;
+          this.addAd(type,num,str);
+
       },
-      insertToContent: function(insert,content,text){
+      addAd: function (type,num,str) {
+          console.log('into addAd')
+
+          for(let i in this.textList){
+              console.log('234')
+              let insert, text = this.textList[i].text;
+              if(type === '0')
+                  insert = this.getAverage(text.length-1,num);
+              else if(type === '1')
+                  insert = this.getRandom(text.length-1,num);
+              this.insertToContent(insert,text,str);
+          }
+          console.log(this.textList)
+          // this.$message({
+          //     message: `原文本共${text.length}子长,本次加入${num}个'${str}'`,
+          //     type: 'success'
+          // });
+      },
+      insertToContent: function(insert,text,str){
           let temp = [];
           for(let i = 0;i < insert.length-1;i++){
-              temp.push(`${content.slice(insert[i],insert[i+1])}${text}`);
+              temp.push(`${text.slice(insert[i],insert[i+1])}${str}`);
           }
-          temp.push(`${content.slice(insert[insert.length-1])}${text}`);
-          this.dealText = temp.join('');
+          temp.push(`${text.slice(insert[insert.length-1])}${str}`);
+          return temp.join('');
       },
       /**
        * 获得len子长中x个随机数
